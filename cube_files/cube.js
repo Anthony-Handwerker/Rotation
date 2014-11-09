@@ -2,7 +2,7 @@
 var canvas;
 var gl;
 
-var NumVertices  = 36;
+var NumVertices  = 128;
 
 var points = [];
 var colors = [];
@@ -77,43 +77,50 @@ function colorCube()
     quad( 6, 5, 1, 2 );
     quad( 4, 5, 6, 7 );
     quad( 5, 4, 0, 1 );
+    quad( 9, 8, 11, 10 );
+    quad( 10, 11, 15, 14 );
+    quad( 11, 8, 12, 15 );
+    quad( 14, 13, 9, 10 );
+    quad( 12, 13, 14, 15 );
+    quad( 13, 12, 8, 9 );
+    quad( 13, 12, 4, 5);
+    quad( 8, 9, 1, 0);
+    quad( 11, 10, 2, 3);
+    quad( 15, 14, 6, 7);
 }
 
 function quad(a, b, c, d) 
 {
     var vertices = [
-        vec3( -0.5, -0.5,  0.5 ),
-        vec3( -0.5,  0.5,  0.5 ),
-        vec3(  0.5,  0.5,  0.5 ),
-        vec3(  0.5, -0.5,  0.5 ),
-        vec3( -0.5, -0.5, -0.5 ),
-        vec3( -0.5,  0.5, -0.5 ),
-        vec3(  0.5,  0.5, -0.5 ),
-        vec3(  0.5, -0.5, -0.5 )
+        vec4( -0.5, -0.5,  0.5, 0.1 ),
+        vec4( -0.5,  0.5,  0.5, 0.1 ),
+        vec4(  0.5,  0.5,  0.5, 0.1 ),
+        vec4(  0.5, -0.5,  0.5, 0.1 ),
+        vec4( -0.5, -0.5, -0.5, 0.1 ),
+        vec4( -0.5,  0.5, -0.5, 0.1 ),
+        vec4(  0.5,  0.5, -0.5, 0.1 ),
+        vec4(  0.5, -0.5, -0.5, 0.1 ),
+        vec4( -0.5, -0.5,  0.5, -0.5 ),
+        vec4( -0.5,  0.5,  0.5, -0.5 ),
+        vec4(  0.5,  0.5,  0.5, -0.5 ),
+        vec4(  0.5, -0.5,  0.5, -0.5 ),
+        vec4( -0.5, -0.5, -0.5, -0.5 ),
+        vec4( -0.5,  0.5, -0.5, -0.5 ),
+        vec4(  0.5,  0.5, -0.5, -0.5 ),
+        vec4(  0.5, -0.5, -0.5, -0.5 )
+
     ];
 
-    var vertexColors = [
-        [ 0.0, 0.0, 0.0, 1.0 ],  // black
-        [ 1.0, 0.0, 0.0, 1.0 ],  // red
-        [ 1.0, 1.0, 0.0, 1.0 ],  // yellow
-        [ 0.0, 1.0, 0.0, 1.0 ],  // green
-        [ 0.0, 0.0, 1.0, 1.0 ],  // blue
-        [ 1.0, 0.0, 1.0, 1.0 ],  // magenta
-        [ 1.0, 1.0, 1.0, 1.0 ],  // white
-        [ 0.0, 1.0, 1.0, 1.0 ]   // cyan
-    ];
-
-    // We need to parition the quad into two triangles in order for
-    // WebGL to be able to render it.  In this case, we create two
-    // triangles from the quad indices
     
-    //vertex color assigned by the index of the vertex
-    
-    var indices = [ a, b, c, a, c, d ];
+    var indices = [ a, b, b, c, c, d, d, a ];
 
     for ( var i = 0; i < indices.length; ++i ) {
-        points.push( vertices[indices[i]] );
-        colors.push( vertexColors[indices[i]] );
+        var temp = vertices[indices[i]];
+        var mult = (temp[3] + 1.0);
+
+        var temp2 = vec3(mult * temp[0], mult * temp[1], mult * temp[2]);
+        points.push( temp2 );
+        colors.push( vec4(mult*0.5, (1 - mult*0.5), 0.0, 1.0) );
     
         // for solid colored faces use 
         //colors.push(vertexColors[a]);
@@ -128,7 +135,7 @@ function render()
     theta[axis] += 2.0;
     gl.uniform3fv(thetaLoc, theta);
 
-    gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
+    gl.drawArrays( gl.LINES, 0, NumVertices );
 
     requestAnimFrame( render );
 }
