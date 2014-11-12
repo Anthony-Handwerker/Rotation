@@ -13,6 +13,7 @@ var zAxis = 2;
 
 var axis = 0;
 var theta = [ 0, 0, 0 ];
+var theta2 = 0.0;
 
 var thetaLoc;
 
@@ -39,6 +40,8 @@ var vertices = [
         vec4(  0.5, -0.5, -0.5, -0.3 )
 
     ];
+
+var vertices2 = [];
 
 
 
@@ -132,6 +135,25 @@ function handleMouseMove(event) {
 
 function colorCube()
 {
+
+    points=[];
+    vertices2=[];
+    for(var i = 0; i < vertices.length; i++)
+    {
+
+        var temp = vertices[i].slice();
+        
+        temp.push(1.0);
+        console.log(temp);
+        var temp2 = rotate_point4d([[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]], theta2, temp);
+
+        var temp3 = temp2.pop();
+        temp2[0] /= temp3;
+        temp2[1] /= temp3;
+        temp2[2] /= temp3;
+        temp2[3] /= temp3;
+        vertices2.push(temp2);
+    }
     quad( 1, 0, 3, 2 );
     quad( 2, 3, 7, 6 );
     quad( 3, 0, 4, 7 );
@@ -158,7 +180,7 @@ function quad(a, b, c, d)
     var indices = [ a, b, b, c, c, d, d, a ];
 
     for ( var i = 0; i < indices.length; ++i ) {
-        var temp = vertices[indices[i]];
+        var temp = vertices2[indices[i]];
         //var mult = (temp[3] + 1.0);
 
         var mult = Math.pow(3.0,temp[3]);
@@ -175,12 +197,20 @@ function quad(a, b, c, d)
 
 function render()
 {
+    colorCube();
+
+    var vBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
+
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     //theta[axis] += 2.0;
     gl.uniform3fv(thetaLoc, theta);
 
     gl.drawArrays( gl.LINES, 0, NumVertices );
+
+    theta2 += 0.5;
 
     requestAnimFrame( render );
 }
