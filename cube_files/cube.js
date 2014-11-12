@@ -16,9 +16,39 @@ var theta = [ 0, 0, 0 ];
 
 var thetaLoc;
 
+var mouseDown = false;
+var lastMouseX = null;
+var lastMouseY = null;
+
+var vertices = [
+        vec4( -0.5, -0.5,  0.5, 0.3 ),
+        vec4( -0.5,  0.5,  0.5, 0.3 ),
+        vec4(  0.5,  0.5,  0.5, 0.3 ),
+        vec4(  0.5, -0.5,  0.5, 0.3 ),
+        vec4( -0.5, -0.5, -0.5, 0.3 ),
+        vec4( -0.5,  0.5, -0.5, 0.3 ),
+        vec4(  0.5,  0.5, -0.5, 0.3 ),
+        vec4(  0.5, -0.5, -0.5, 0.3 ),
+        vec4( -0.5, -0.5,  0.5, -0.3 ),
+        vec4( -0.5,  0.5,  0.5, -0.3 ),
+        vec4(  0.5,  0.5,  0.5, -0.3 ),
+        vec4(  0.5, -0.5,  0.5, -0.3 ),
+        vec4( -0.5, -0.5, -0.5, -0.3 ),
+        vec4( -0.5,  0.5, -0.5, -0.3 ),
+        vec4(  0.5,  0.5, -0.5, -0.3 ),
+        vec4(  0.5, -0.5, -0.5, -0.3 )
+
+    ];
+
+
+
 window.onload = function init()
 {
     canvas = document.getElementById( "gl-canvas" );
+
+    canvas.onmousedown = handleMouseDown;
+    document.onmouseup = handleMouseUp;
+    document.onmousemove = handleMouseMove;
     
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
@@ -69,6 +99,37 @@ window.onload = function init()
     render();
 }
 
+
+
+function handleMouseDown(event) {
+    mouseDown = true;
+    lastMouseX = event.clientX;
+    lastMouseY = event.clientY;
+}
+
+function handleMouseUp(event) {
+    mouseDown = false;
+}
+
+function handleMouseMove(event) {
+    if (!mouseDown) {
+        return;
+    }
+    var newX = event.clientX;
+    var newY = event.clientY;
+
+    var deltaX = newX - lastMouseX;
+    
+
+    var deltaY = newY - lastMouseY;
+
+    theta[0] += deltaY/5.0;
+    theta[1] += deltaX/5.0;
+
+    lastMouseX = newX
+    lastMouseY = newY;
+}
+
 function colorCube()
 {
     quad( 1, 0, 3, 2 );
@@ -91,34 +152,18 @@ function colorCube()
 
 function quad(a, b, c, d) 
 {
-    var vertices = [
-        vec4( -0.5, -0.5,  0.5, 0.1 ),
-        vec4( -0.5,  0.5,  0.5, 0.1 ),
-        vec4(  0.5,  0.5,  0.5, 0.1 ),
-        vec4(  0.5, -0.5,  0.5, 0.1 ),
-        vec4( -0.5, -0.5, -0.5, 0.1 ),
-        vec4( -0.5,  0.5, -0.5, 0.1 ),
-        vec4(  0.5,  0.5, -0.5, 0.1 ),
-        vec4(  0.5, -0.5, -0.5, 0.1 ),
-        vec4( -0.5, -0.5,  0.5, -0.5 ),
-        vec4( -0.5,  0.5,  0.5, -0.5 ),
-        vec4(  0.5,  0.5,  0.5, -0.5 ),
-        vec4(  0.5, -0.5,  0.5, -0.5 ),
-        vec4( -0.5, -0.5, -0.5, -0.5 ),
-        vec4( -0.5,  0.5, -0.5, -0.5 ),
-        vec4(  0.5,  0.5, -0.5, -0.5 ),
-        vec4(  0.5, -0.5, -0.5, -0.5 )
-
-    ];
+    
 
     
     var indices = [ a, b, b, c, c, d, d, a ];
 
     for ( var i = 0; i < indices.length; ++i ) {
         var temp = vertices[indices[i]];
-        var mult = (temp[3] + 1.0);
+        //var mult = (temp[3] + 1.0);
 
-        var temp2 = vec3(mult * temp[0], mult * temp[1], mult * temp[2]);
+        var mult = Math.pow(3.0,temp[3]);
+
+        var temp2 = vec3(mult * temp[0] * 0.7, mult * temp[1] * 0.7, mult * temp[2] * 0.7);
         points.push( temp2 );
         colors.push( vec4(mult*0.5, (1 - mult*0.5), 0.0, 1.0) );
     
@@ -132,7 +177,7 @@ function render()
 {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    theta[axis] += 2.0;
+    //theta[axis] += 2.0;
     gl.uniform3fv(thetaLoc, theta);
 
     gl.drawArrays( gl.LINES, 0, NumVertices );
