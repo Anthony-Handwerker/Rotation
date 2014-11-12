@@ -218,6 +218,7 @@ function render()
     gl.drawArrays( gl.LINES, 0, NumVertices );
 
     theta2 += 1.0;
+    theta2 %= 360.0;
 
     requestAnimFrame( render );
 }
