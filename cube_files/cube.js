@@ -144,7 +144,7 @@ function colorCube()
         var temp = vertices[i].slice();
         
         temp.push(1.0);
-        console.log(temp);
+
         var temp2 = rotate_point4d([[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]], theta2, temp);
 
         var temp3 = temp2.pop();
@@ -197,11 +197,18 @@ function quad(a, b, c, d)
 
 function render()
 {
+    console.log(theta2);
     colorCube();
+
+    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
+
+    var vPosition = gl.getAttribLocation( program, "vPosition" );
+    gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -210,7 +217,7 @@ function render()
 
     gl.drawArrays( gl.LINES, 0, NumVertices );
 
-    theta2 += 0.5;
+    theta2 += 1.0;
 
     requestAnimFrame( render );
 }
