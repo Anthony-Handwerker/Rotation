@@ -5,7 +5,7 @@
 function rotate_point4d(axis, angle, point) {
 	var mat = rotate4d(axis, angle);
 	var tmp = transpose([point]);
-	tmp = nd_mult(mat, point);
+	tmp = nd_mult(mat, tmp);
 	tmp = transpose(tmp)[0];
 	return tmp;
 }
@@ -254,7 +254,7 @@ function log_matrix (v) {
 function test_everything() {
 	maxis = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]];
 	mangle = 0;
-	mpoint = [[0, 0, 1, 0, 1]];
+	mpoint = [-0.5, -0.5, 0.5, 0.3, 1];
 	mpoint = transpose(mpoint);
 	
 	console.log("axis: ");
