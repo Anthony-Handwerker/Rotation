@@ -42,12 +42,12 @@ function rotate4d(axis, angle) {
 
 	var res_mat = scal_mult(trans_mat, -1);
 	
-	console.log("res_mat");
-	log_matrix(res_mat);
+	// console.log("res_mat");
+	// log_matrix(res_mat);
 	
 	res_mat = nd_mult(space, res_mat);
-	console.log("res_mat_2");
-	log_matrix(res_mat);
+	// console.log("res_mat_2");
+	// log_matrix(res_mat);
 	
 	// console.log("space");
 	// log_matrix(space);
@@ -59,18 +59,18 @@ function rotate4d(axis, angle) {
 	// log_matrix(rotate(angle, intersection));
 	
 	res_mat = nd_mult(rotate(angle, intersection), res_mat);
-	console.log("res_mat_3");
-	log_matrix(res_mat);
+	// console.log("res_mat_3");
+	// log_matrix(res_mat);
 
 	
 	res_mat = nd_mult(transpose(space), res_mat);
-	console.log("res_mat_4");
-	log_matrix(res_mat);
+	// console.log("res_mat_4");
+	// log_matrix(res_mat);
 	
 	res_mat = nd_mult(res_mat, trans_mat);
-	console.log("res_mat_5");
-	log_matrix(res_mat);
-	console.log("end");
+	// console.log("res_mat_5");
+	// log_matrix(res_mat);
+	// console.log("end");
 	return res_mat;
 }
 
@@ -253,7 +253,7 @@ function log_matrix (v) {
 
 function test_everything() {
 	maxis = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]];
-	mangle = 50;
+	mangle = 0;
 	mpoint = [[0, 0, 1, 0, 1]];
 	mpoint = transpose(mpoint);
 	
