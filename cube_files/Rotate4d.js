@@ -11,7 +11,7 @@ function rotate_point4d(axis, angle, point) {
 	tmp = transpose(tmp)[0];
 	return tmp;
 }
-
+/*
 function is_independent(a, b, c)
 {
 	var y = (a[0]*c[1]-a[1]*c[0])/(a[0]*b[1]-b[0]*a[1])
@@ -21,6 +21,28 @@ function is_independent(a, b, c)
 		return true;
 	if(a[3]*x + b[3]*y != c[3])
 		return true;
+	return false;
+}
+*/
+function is_independent(basis, vec) {
+	var res_vec = [];
+	if (!Array.isArray(vec[0])) {
+		vec = [vec];
+	}
+	if (vec[0].length != 1) {
+		vec = transpose(vec);
+	}
+	for (var i = 0; i < basis[0].length; i++) {
+		res_vec.push(0);
+	}
+	for (var i = 0; i < basis.length; i++) {
+		res_vec = nd_add(scal_mult(basis[i], nd_mult([basis[i]], vec)), res_vec);
+	}
+	for (var i = 0; i < res_vec.length; i++) {
+		if (Math.abs(vec[i] - res_vec[i]) > 0.00001) {
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -227,6 +249,14 @@ function scal_mult(mat, val) {
 	}
 	return res_mat;
 }
+
+function nd_add(vec1, vec2) {
+	var res_vec = [];
+	for (var i = 0; i < vec1.length; i++) {
+		res_vec.push(vec1[i] + vec2[i]);
+	}
+	return res_vec;
+}
 // from translate
 function nd_translate(translation) {
 	var n = translation.length;
@@ -245,7 +275,7 @@ function normal_space(basis, x, y) {
 	var new_vec1;
 	var i = 0;
 	for (i = 0; i < 4; i++) {
-		if(is_independent(basis[0], basis[1], test_vecs[i]))
+		if(is_independent(basis, test_vecs[i]))
 		{
 			new_vec1 = test_vecs[i].slice(0);
 			break;
@@ -254,7 +284,7 @@ function normal_space(basis, x, y) {
 	
 	var new_vec2;
 	for (i = i + 1; i < 4; i++) {
-		if(is_independent(basis[0], basis[1], test_vecs[i]))
+		if(is_independent(basis, test_vecs[i]))
 		{
 			new_vec2 = test_vecs[i].slice(0);
 			break;
@@ -307,6 +337,9 @@ function gram_shmidt(basis) {
 
 function magnitude(v) {
 	var res = 0.0;
+	if (!Array.isArray(v[0])) {
+		v = [v];
+	}
 	if (v[0].length == 1) {
 		for (var i = v.length - 1; i >= 0; i--) {
 			res += v[i][0] * v[i][0];
@@ -374,4 +407,18 @@ function test_everything() {
 	console.log(rotate_point4d(maxis, mangle, mpoint));
 	
 	return maxis;
+}
+
+function test_sequence() {
+	maxis = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]];
+	mangle = 0;
+	mpoint = [-0.5, -0.5, 0.5, 0.3, 1];
+	
+	var mat;
+	var results = [];
+	
+	for (var i = 0; i <= 360; i += 1) {
+		results.push(rotate_point4d(maxis, i, mpoint));
+	}
+	return results;
 }
