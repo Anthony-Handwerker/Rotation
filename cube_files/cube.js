@@ -194,11 +194,6 @@ function quad(a, b, c, d)
 
 function render()
 {
-<<<<<<< HEAD
-    // console.log(theta2);
-=======
-
->>>>>>> 066b7460bf2123ec2b2ec3e4f292ade0c4762b4f
     colorCube();
 
     
