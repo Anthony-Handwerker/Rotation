@@ -11,6 +11,19 @@ function rotate_point4d(axis, angle, point) {
 	tmp = transpose(tmp)[0];
 	return tmp;
 }
+
+function is_independent(a, b, c)
+{
+	var y = (a[0]*c[1]-a[1]*c[0])/(a[0]*b[1]-b[0]*a[1])
+	//console.log(y);
+	var x = (c[0]-b[0]*y)/a[0];
+	if(a[2]*x + b[2]*y != c[2])
+		return true;
+	if(a[3]*x + b[3]*y != c[3])
+		return true;
+	return false;
+}
+
 function rotate4d(axis, angle, point) {
 	s = normal_space(axis.slice(1));
 	
@@ -228,14 +241,24 @@ function nd_translate(translation) {
 function normal_space(basis, x, y) {
 	// two random vectors hopefully linearly independent of the basis.
 	var y = basis[0].length;
-	var new_vec1 = [];
-	for (var i = 0; i < y; i++) {
-		new_vec1.push(Math.random());
+	var test_vecs = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
+	var new_vec1;
+	var i = 0;
+	for (i = 0; i < 4; i++) {
+		if(is_independent(basis[0], basis[1], test_vecs[i]))
+		{
+			new_vec1 = test_vecs[i].slice(0);
+			break;
+		}
 	}
 	
-	var new_vec2 = [];
-	for (var i = 0; i < y; i++) {
-		new_vec2.push(Math.random());
+	var new_vec2;
+	for (i = i + 1; i < 4; i++) {
+		if(is_independent(basis[0], basis[1], test_vecs[i]))
+		{
+			new_vec2 = test_vecs[i].slice(0);
+			break;
+		}
 	}
 	
 	var result_space = [];
@@ -245,8 +268,8 @@ function normal_space(basis, x, y) {
 
 	result_space.push(new_vec1);
 	result_space.push(new_vec2);
-	// console.log("result_space");
-	// log_matrix(result_space);
+	//console.log("result_space");
+	//log_matrix(result_space);
 	
 	result_space = gram_shmidt(result_space);
 	
@@ -329,7 +352,7 @@ function log_matrix (v) {
 }
 
 function test_everything() {
-	maxis = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]];
+	maxis = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]];
 	mangle = 0;
 	mpoint = [-0.5, -0.5, 0.5, 0.3, 1];
 	
