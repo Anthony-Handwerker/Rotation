@@ -3,6 +3,7 @@ var canvas;
 var gl;
 
 var NumVertices  = 128;
+var program;
 
 var points = [];
 var colors = [];
@@ -16,6 +17,8 @@ var theta = [ 0, 0, 0 ];
 var theta2 = 0.0;
 
 var thetaLoc;
+
+var is_rotating = false;
 
 var mouseDown = false;
 var lastMouseX = null;
@@ -66,7 +69,7 @@ window.onload = function init()
     //
     //  Load shaders and initialize attribute buffers
     //
-    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
     
     var cBuffer = gl.createBuffer();
@@ -89,16 +92,10 @@ window.onload = function init()
     
     //event listeners for buttons
     
-    document.getElementById( "xButton" ).onclick = function () {
-        axis = xAxis;
+    document.getElementById( "Toggle_Rotate" ).onclick = function () {
+        is_rotating = !is_rotating;
     };
-    document.getElementById( "yButton" ).onclick = function () {
-        axis = yAxis;
-    };
-    document.getElementById( "zButton" ).onclick = function () {
-        axis = zAxis;
-    };
-        
+    
     render();
 }
 
@@ -138,6 +135,7 @@ function colorCube()
 
     points=[];
     vertices2=[];
+    colors = [];
     for(var i = 0; i < vertices.length; i++)
     {
 
@@ -197,10 +195,10 @@ function quad(a, b, c, d)
 
 function render()
 {
-    console.log(theta2);
+
     colorCube();
 
-    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
@@ -210,6 +208,17 @@ function render()
     gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
+    var cBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW );
+
+    var vColor = gl.getAttribLocation( program, "vColor" );
+    gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vColor );
+
+    if (is_rotating) theta2 += 1.0;
+    theta2 %= 360.0;
+    
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     //theta[axis] += 2.0;
@@ -217,9 +226,11 @@ function render()
 
     gl.drawArrays( gl.LINES, 0, NumVertices );
 
-    theta2 += 1.0;
-    theta2 %= 360.0;
+    
 
     requestAnimFrame( render );
+
+    
+
 }
 
