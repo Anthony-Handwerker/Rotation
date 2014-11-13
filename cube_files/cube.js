@@ -146,7 +146,7 @@ function colorCube()
         temp.push(1.0);
 
         var temp2 = rotate_point4d([[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]], theta2, temp);
-
+        // var temp2 = temp;
         var temp3 = temp2.pop();
         temp2[0] /= temp3;
         temp2[1] /= temp3;
@@ -197,7 +197,7 @@ function quad(a, b, c, d)
 
 function render()
 {
-    console.log(theta2);
+    // console.log(theta2);
     colorCube();
 
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );

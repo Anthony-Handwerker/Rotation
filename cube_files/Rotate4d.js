@@ -3,17 +3,25 @@
 // axis of assumed format (translation, basis_1, basis_2, etc.)
 // TODO: Make a better one with matrices and stuff
 function rotate_point4d(axis, angle, point) {
-	var mat = rotate4d(axis, angle);
+	var mats = rotate4d(axis, angle, point);
 	var tmp = transpose([point]);
-	tmp = nd_mult(mat, tmp);
+	tmp = nd_mult(mats[0], tmp);
+	tmp = nd_mult(mats[1], tmp);
+	tmp = nd_mult(mats[2], tmp);
 	tmp = transpose(tmp)[0];
 	return tmp;
 }
-function rotate4d(axis, angle) {
+function rotate4d(axis, angle, point) {
 	s = normal_space(axis.slice(1));
+	
 	intersection = [1, 0, 0, 1];
 	space = s[0];
 	
+	var axis_plane = axis.slice(1);
+		
+	// console.log("axis_plane");
+	// log_matrix(axis_plane);
+		
 	// console.log("space");
 	// log_matrix(space);
 	
@@ -29,7 +37,9 @@ function rotate4d(axis, angle) {
 	
 	// console.log("space");
 	// log_matrix(space);
-	translation = transpose([axis[0]]);
+	
+	var translation = transpose([axis[0]]);
+	translation = scal_mult(translation, -1);
 	
 	// console.log("translation");
 	// log_matrix(translation);
@@ -38,15 +48,65 @@ function rotate4d(axis, angle) {
 	
 	// console.log("trans_mat");
 	// log_matrix(trans_mat);
-
-
-	var res_mat = scal_mult(trans_mat, -1);
 	
-	// console.log("res_mat");
-	// log_matrix(res_mat);
+	var pre_translate = trans_mat;
+
+	// var res_mat = trans_mat;
 	
-	res_mat = nd_mult(space, res_mat);
-	// console.log("res_mat_2");
+	// console.log("pre_translate");
+	// log_matrix(pre_translate);
+	
+	// console.log("transpose([point])");
+	// log_matrix(transpose([point]));
+
+	var tmp = nd_mult(pre_translate, transpose([point]));
+	// console.log("tmp");
+	// log_matrix(tmp);
+	
+	tmp = transpose(tmp)[0];
+	for (var i = tmp.length - 2; i >= 0; i--) {
+		tmp[i] = tmp[i] / tmp[4];
+	}
+	tmp.pop();
+	
+	tmp = transpose([tmp]);
+	
+	// console.log("tmp");
+	// log_matrix(tmp);
+	
+	// console.log("axis_plane[0]");
+	// console.log(axis_plane[0]);
+	
+	// console.log("scal_mult(axis_plane[0], nd_mult([axis_plane[0]], tmp))");
+	// console.log(scal_mult(axis_plane[0], nd_mult([axis_plane[0]], tmp)));
+	
+	tmp = scal_mult(axis_plane[0], nd_mult([axis_plane[0]], tmp))
+		
+	tmp.push(1);
+	tmp = transpose([tmp]);
+	
+	// console.log("tmp");
+	// log_matrix(tmp);
+		
+	
+	var translation2 = scal_mult(tmp, -1);
+		
+	var trans_mat2 = nd_translate(translation2);
+	
+	// console.log("translation2");
+	// log_matrix(translation2);
+	
+	// console.log("trans_mat2");
+	// log_matrix(trans_mat2);
+	
+	pre_translate = nd_mult(trans_mat2, pre_translate)
+	// res_mat = nd_mult(res_mat, trans_mat2);
+	
+	// console.log("pre_translate_2");
+	// log_matrix(pre_translate);
+	
+	var res_mat = space;
+	// console.log("res_mat_3");
 	// log_matrix(res_mat);
 	
 	// console.log("space");
@@ -59,19 +119,36 @@ function rotate4d(axis, angle) {
 	// log_matrix(rotate(angle, intersection));
 	
 	res_mat = nd_mult(rotate(angle, intersection), res_mat);
-	// console.log("res_mat_3");
-	// log_matrix(res_mat);
-
-	
-	res_mat = nd_mult(transpose(space), res_mat);
 	// console.log("res_mat_4");
 	// log_matrix(res_mat);
+
+	// console.log("transpose(space)");
+	// log_matrix(transpose(space));
 	
-	res_mat = nd_mult(res_mat, trans_mat);
+	res_mat = nd_mult(transpose(space), res_mat);
 	// console.log("res_mat_5");
 	// log_matrix(res_mat);
+	
+	translation2 = scal_mult(tmp, -1);
+		
+	trans_mat2 = nd_translate(translation2);
+	
+	var post_translate = trans_mat2;
+	// res_mat = nd_mult(res_mat, trans_mat2);
+	
+	// console.log("post_translate");
+	// log_matrix(post_translate);
+	
+	translation = scal_mult(translation, -1);
+		
+	trans_mat = nd_translate(translation);
+	
+	post_translate = nd_mult(trans_mat, post_translate);
+	
+	// console.log("post_translate_2");
+	// log_matrix(post_translate);
 	// console.log("end");
-	return res_mat;
+	return [pre_translate, res_mat, post_translate];
 }
 
 // space has form [translation, basis]
@@ -124,7 +201,7 @@ function scal_mult(mat, val) {
 	}
 	else if (mat[0].length == 1) {
 		for (var i = 0; i < mat.length; i++) {
-			res_mat.push([mat[i][0]]);
+			res_mat.push([mat[i][0] * val]);
 		}
 	}
 	else {
@@ -162,7 +239,7 @@ function normal_space(basis, x, y) {
 	}
 	
 	var result_space = [];
-	for (var i = basis.length - 1; i >= 0; i--) {
+	for (var i = 0; i < basis.length; i++) {
 		result_space.push(basis[i].slice(0))
 	}
 
@@ -255,7 +332,6 @@ function test_everything() {
 	maxis = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]];
 	mangle = 0;
 	mpoint = [-0.5, -0.5, 0.5, 0.3, 1];
-	mpoint = transpose(mpoint);
 	
 	console.log("axis: ");
 	log_matrix(maxis);
@@ -264,13 +340,10 @@ function test_everything() {
 	console.log(mangle);
 	
 	console.log("point: ");
-	log_matrix(mpoint);
-	
-	console.log("transpose axis: ");
-	log_matrix(transpose(maxis));
-	
+	console.log(mpoint);
+		
 	console.log("rotation: ");
-	log_matrix(rotate4d(maxis, mangle));
+	log_matrix(rotate4d(maxis, mangle, mpoint));
 	
 	console.log("point change");
 	console.log(rotate_point4d(maxis, mangle, mpoint));
