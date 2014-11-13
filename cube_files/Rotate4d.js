@@ -129,7 +129,7 @@ function rotate4d(axis, angle, point) {
 	// console.log("res_mat_5");
 	// log_matrix(res_mat);
 	
-	translation2 = scal_mult(tmp, -1);
+	translation2 = scal_mult(translation2, -1);
 		
 	trans_mat2 = nd_translate(translation2);
 	
@@ -329,9 +329,9 @@ function log_matrix (v) {
 }
 
 function test_everything() {
-	maxis = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]];
-	mangle = 0;
-	mpoint = [-0.5, -0.5, 0.5, 0.3, 1];
+	var maxis = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]];
+	var mangle = 30;
+	var mpoint = [-0.5, -0.5, 0.5, 0.3, 1];
 	
 	console.log("axis: ");
 	log_matrix(maxis);
@@ -341,9 +341,9 @@ function test_everything() {
 	
 	console.log("point: ");
 	console.log(mpoint);
-		
-	console.log("rotation: ");
-	log_matrix(rotate4d(maxis, mangle, mpoint));
+	var mat = rotate4d(maxis, mangle, mpoint)
+	console.log("rotation");
+	log_matrix(mat[1]);
 	
 	console.log("point change");
 	console.log(rotate_point4d(maxis, mangle, mpoint));
