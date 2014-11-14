@@ -143,7 +143,7 @@ function colorCube()
         
         temp.push(1.0);
 
-        var temp2 = rotate_point4d([[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]], theta2, temp);
+        var temp2 = rotate_point4d([[0, 0, 0, 0, 1], [1, 0, 1, 0], [0, 1, 0, 0]], theta2, temp);
         var temp3 = temp2.pop();
         temp2[0] /= temp3;
         temp2[1] /= temp3;

@@ -47,7 +47,15 @@ function is_independent(basis, vec) {
 }
 
 function rotate4d(axis, angle, point) {
+	var tmp = gram_shmidt(axis.slice(1));
+	axis[1] = tmp[0];
+	axis[2] = tmp[1];
+
 	s = normal_space(axis.slice(1));
+	
+	// console.log("s");
+	// log_matrix(s);
+
 	
 	intersection = [1, 0, 0, 1];
 	space = s[0];
@@ -85,8 +93,6 @@ function rotate4d(axis, angle, point) {
 	// log_matrix(trans_mat);
 	
 	var pre_translate = trans_mat;
-
-	// var res_mat = trans_mat;
 	
 	// console.log("pre_translate");
 	// log_matrix(pre_translate);
@@ -134,9 +140,11 @@ function rotate4d(axis, angle, point) {
 	// console.log("trans_mat2");
 	// log_matrix(trans_mat2);
 	
-	pre_translate = nd_mult(trans_mat2, pre_translate)
-	// res_mat = nd_mult(res_mat, trans_mat2);
+	// console.log("pre_translate");
+	// log_matrix(pre_translate);
 	
+	pre_translate = nd_mult(trans_mat2, pre_translate)
+		
 	// console.log("pre_translate_2");
 	// log_matrix(pre_translate);
 	
@@ -152,8 +160,12 @@ function rotate4d(axis, angle, point) {
 	
 	// console.log("3d rotation");
 	// log_matrix(rotate(angle, intersection));
-	
-	res_mat = nd_mult(rotate(angle, intersection), res_mat);
+	var tmp_intersection = intersection.slice(0);
+	tmp_intersection.splice(-1, 1);
+	// console.log("tmp_intersection");
+	// console.log(tmp_intersection);
+
+	res_mat = nd_mult(rotate(angle, tmp_intersection), res_mat);
 	// console.log("res_mat_4");
 	// log_matrix(res_mat);
 
@@ -169,8 +181,7 @@ function rotate4d(axis, angle, point) {
 	trans_mat2 = nd_translate(translation2);
 	
 	var post_translate = trans_mat2;
-	// res_mat = nd_mult(res_mat, trans_mat2);
-	
+		
 	// console.log("post_translate");
 	// log_matrix(post_translate);
 	
@@ -272,34 +283,39 @@ function normal_space(basis, x, y) {
 	// two random vectors hopefully linearly independent of the basis.
 	var y = basis[0].length;
 	var test_vecs = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
+	
+	var result_space = [];
+	for (var i = 0; i < basis.length; i++) {
+		result_space.push(basis[i].slice(0))
+	}
+	
 	var new_vec1;
 	var i = 0;
 	for (i = 0; i < 4; i++) {
-		if(is_independent(basis, test_vecs[i]))
+		if(is_independent(result_space, test_vecs[i]))
 		{
 			new_vec1 = test_vecs[i].slice(0);
 			break;
 		}
 	}
 	
+	result_space.push(new_vec1);
+	result_space = gram_shmidt(result_space);
+	
 	var new_vec2;
 	for (i = i + 1; i < 4; i++) {
-		if(is_independent(basis, test_vecs[i]))
+		if(is_independent(result_space, test_vecs[i]))
 		{
 			new_vec2 = test_vecs[i].slice(0);
 			break;
 		}
 	}
 	
-	var result_space = [];
-	for (var i = 0; i < basis.length; i++) {
-		result_space.push(basis[i].slice(0))
-	}
-
-	result_space.push(new_vec1);
 	result_space.push(new_vec2);
-	//console.log("result_space");
-	//log_matrix(result_space);
+	
+	
+	// console.log("result_space");
+	// log_matrix(result_space);
 	
 	result_space = gram_shmidt(result_space);
 	
@@ -386,9 +402,10 @@ function log_matrix (v) {
 
 function test_everything() {
 
-	maxis = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]];
-	mangle = 0;
-	mpoint = [-0.5, -0.5, 0.5, 0.3, 1];
+	maxis = [[0, 0, 0, 0, 1], [1, 0, 1, 0], [0, 1, 0, 0]];
+	mangle = 180;
+	// mpoint = [-0.5, -0.5, 0.5, 0.3, 1];
+	mpoint = [1, 1, 1, 1, 1];
 
 	
 	console.log("axis: ");
@@ -417,7 +434,7 @@ function test_sequence() {
 	var mat;
 	var results = [];
 	
-	for (var i = 0; i <= 360; i += 1) {
+	for (var i = 0; i <= 360; i += 45) {
 		results.push(rotate_point4d(maxis, i, mpoint));
 	}
 	return results;
