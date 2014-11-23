@@ -8,11 +8,14 @@ var program;
 var points = [];
 var colors = [];
 
+var rot_plane = [[0,0,0,0,1],[1,0,0,0],[0,1,0,0]];
+
 var xAxis = 0;
 var yAxis = 1;
 var zAxis = 2;
 
 var axis = 0;
+var rot_speed = 1.0;
 var theta = [ 0, 0, 0 ];
 var theta2 = 0.0;
 
@@ -24,34 +27,13 @@ var mouseDown = false;
 var lastMouseX = null;
 var lastMouseY = null;
 
-var vertices = [
-        vec4( -0.5, -0.5,  0.5, 0.5 ),
-        vec4( -0.5,  0.5,  0.5, 0.5 ),
-        vec4(  0.5,  0.5,  0.5, 0.5 ),
-        vec4(  0.5, -0.5,  0.5, 0.5 ),
-        vec4( -0.5, -0.5, -0.5, 0.5 ),
-        vec4( -0.5,  0.5, -0.5, 0.5 ),
-        vec4(  0.5,  0.5, -0.5, 0.5 ),
-        vec4(  0.5, -0.5, -0.5, 0.5 ),
-        vec4( -0.5, -0.5,  0.5, -0.5 ),
-        vec4( -0.5,  0.5,  0.5, -0.5 ),
-        vec4(  0.5,  0.5,  0.5, -0.5 ),
-        vec4(  0.5, -0.5,  0.5, -0.5 ),
-        vec4( -0.5, -0.5, -0.5, -0.5 ),
-        vec4( -0.5,  0.5, -0.5, -0.5 ),
-        vec4(  0.5,  0.5, -0.5, -0.5 ),
-        vec4(  0.5, -0.5, -0.5, -0.5 )
-        /*vec4(-0.2, -0.2, 0.34641016151, -0.2),
-        vec4(-0.2, -0.2, -0.34641016151, -0.2),
-        vec4(-0.2, 0.4, 0.0, -0.2),
-        vec4(0.34641016151, 0.0, 0.0, -0.2),
-        vec4(0.0,0.0,0.0, 0.34641016151)*/
-
-    ];
+var vertices = [];
 
 var edges = [];
 
 var vertices2 = [];
+
+var vertices_default = [];
 
 
 
@@ -104,6 +86,24 @@ window.onload = function init()
         is_rotating = !is_rotating;
     };
 
+    document.getElementById( "New_Rotate" ).onclick = function () {
+        vertices = vertices2.slice(0);
+        theta2 = 0;
+        rot_plane = [[0,0,0,0,1],
+                    [parseFloat(document.getElementById("x1").value),
+                    parseFloat(document.getElementById("y1").value),
+                    parseFloat(document.getElementById("z1").value),
+                    parseFloat(document.getElementById("t1").value)],
+                    [parseFloat(document.getElementById("x2").value),
+                    parseFloat(document.getElementById("y2").value),
+                    parseFloat(document.getElementById("z2").value),
+                    parseFloat(document.getElementById("t2").value)]];
+    };
+    document.getElementById("Reset").onclick = function() {
+        vertices = vertices_default.slice(0);
+        theta2 = 0;
+    };
+
     var fileInput = document.getElementById("model");
     fileInput.addEventListener('change', function(e)
     {
@@ -134,7 +134,7 @@ window.onload = function init()
                     var line = vals[i].split(" ");
                     var newEdge = [parseInt(line[0]), parseInt(line[1])];
                     edges.push(newEdge);
-                    console.log(newEdge);
+                    //console.log(newEdge);
                     NumVertices += 2;
                 }
                 else
@@ -142,6 +142,8 @@ window.onload = function init()
                     var line = vals[i].split(" ");
                     var newVertex = [parseFloat(line[0]), parseFloat(line[1]), parseFloat(line[2]), parseFloat(line[3])];
                     vertices.push(newVertex);
+                    vertices2.push(newVertex.slice(0));
+                    vertices_default.push(newVertex.slice(0));
                 }
             }
             theta = [0,0,0];
@@ -151,6 +153,11 @@ window.onload = function init()
 
         reader.readAsText(file);
     });
+
+    document.getElementById("speed").onchange = function() {
+        rot_speed = parseFloat(event.srcElement.value);
+        console.log(rot_speed);
+    };
     
     render();
 }
@@ -199,7 +206,7 @@ function colorCube()
         
         temp.push(1.0);
 
-        var temp2 = rotate_point4d([[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]], theta2, temp);
+        var temp2 = rotate_point4d(rot_plane, theta2, temp);
         var temp3 = temp2.pop();
         temp2[0] /= temp3;
         temp2[1] /= temp3;
@@ -278,8 +285,9 @@ function render()
     gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vColor );
 
-    if (is_rotating) theta2 += 1.0;
+    if (is_rotating) theta2 += rot_speed;
     theta2 %= 360.0;
+    //console.log(theta2);
     
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
