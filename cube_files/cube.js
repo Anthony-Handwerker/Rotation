@@ -8,6 +8,7 @@ var program;
 var points = [];
 var colors = [];
 
+
 var rot_plane = [[0,0,0,0,1],[1,0,0,0],[0,1,0,0]];
 
 var xAxis = 0;
@@ -28,12 +29,15 @@ var lastMouseX = null;
 var lastMouseY = null;
 
 var vertices = [];
-
 var edges = [];
-
 var vertices2 = [];
-
 var vertices_default = [];
+var face_map = [];
+
+var clip_flag = false;
+
+var clip_vertices = [];
+var clip_edges = [];
 
 
 
@@ -86,6 +90,11 @@ window.onload = function init()
         is_rotating = !is_rotating;
     };
 
+    document.getElementById( "Clip" ).onclick = function()
+    {
+        clip_flag = !clip_flag;
+    }
+
     document.getElementById( "New_Rotate" ).onclick = function () {
         vertices = vertices2.slice(0);
         theta2 = 0;
@@ -102,6 +111,7 @@ window.onload = function init()
     document.getElementById("Reset").onclick = function() {
         vertices = vertices_default.slice(0);
         theta2 = 0;
+        theta = [0,0,0];
     };
 
     var fileInput = document.getElementById("model");
@@ -116,20 +126,36 @@ window.onload = function init()
             var input = reader.result;
             var vals = input.split("\n");
             vertices = [];
+            vertices2 = [];
+            vertices_default = [];
             edges = [];
             NumVertices = 0;
-            var flag = false;
+            var flag = 0;
             for(var i = 0; i < vals.length; i++)
             {
                 if(vals[i].trim() == "VERTICES")
                 {
-                    flag = false;
+                    flag = 0;
                 }
                 else if(vals[i].trim() == "EDGES")
                 {
-                    flag = true;
+                    flag = 1;
                 }
-                else if(flag)
+                else if(vals[i].trim() == "FACES")
+                {
+                    flag = 2;
+                    face_map = [];
+                    var temp = [];
+                    for(var j = 0; j < edges.length; j++)
+                    {
+                        temp.push(false);
+                    }
+                    for(var j = 0; j < edges.length; j++)
+                    {
+                        face_map.push(temp.slice(0));
+                    }
+                }
+                else if(flag == 1)
                 {
                     var line = vals[i].split(" ");
                     var newEdge = [parseInt(line[0]), parseInt(line[1])];
@@ -137,13 +163,27 @@ window.onload = function init()
                     //console.log(newEdge);
                     NumVertices += 2;
                 }
-                else
+                else if(flag == 0)
                 {
                     var line = vals[i].split(" ");
                     var newVertex = [parseFloat(line[0]), parseFloat(line[1]), parseFloat(line[2]), parseFloat(line[3])];
                     vertices.push(newVertex);
                     vertices2.push(newVertex.slice(0));
                     vertices_default.push(newVertex.slice(0));
+                }
+                else if(flag == 2)
+                {
+                    var line = vals[i].split(" ");
+                    for(var j = 0; j < line.length; j++)
+                    {
+                        for(var k = j + 1; k < line.length; k++)
+                        {
+                            var a = parseInt(line[j]);
+                            var b = parseInt(line[k]);
+                            face_map[a][b] = true;
+                            face_map[b][a] = true;
+                        }
+                    }
                 }
             }
             theta = [0,0,0];
@@ -156,7 +196,7 @@ window.onload = function init()
 
     document.getElementById("speed").onchange = function() {
         rot_speed = parseFloat(event.srcElement.value);
-        console.log(rot_speed);
+        //console.log(rot_speed);
     };
     
     render();
@@ -199,24 +239,55 @@ function colorCube()
     points=[];
     vertices2=[];
     colors = [];
-    for(var i = 0; i < vertices.length; i++)
+    if (clip_flag)
     {
+        for(var i = 0; i < vertices.length; i++)
+        {
+            var temp = vertices[i].slice();
+            
+            temp.push(1.0);
 
-        var temp = vertices[i].slice();
-        
-        temp.push(1.0);
+            var temp2 = rotate_point4d(rot_plane, theta2, temp);
+            var temp3 = temp2.pop();
+            temp2[0] /= temp3;
+            temp2[1] /= temp3;
+            temp2[2] /= temp3;
+            temp2[3] /= temp3;
+            vertices2.push(temp2);
+        }
+        var temp = clip_figure(vertices2, edges, face_map, 0.0);
+        //console.log(temp);
 
-        var temp2 = rotate_point4d(rot_plane, theta2, temp);
-        var temp3 = temp2.pop();
-        temp2[0] /= temp3;
-        temp2[1] /= temp3;
-        temp2[2] /= temp3;
-        temp2[3] /= temp3;
-        vertices2.push(temp2);
+        clip_vertices = temp[0].slice(0);
+        clip_edges = temp[1].slice(0);
+        for(var i = 0; i < clip_edges.length; i++)
+        {
+            clip_line(clip_edges[i][0], clip_edges[i][1]);
+        }
+        NumVertices = clip_edges.length * 2;
     }
-    for(var i = 0; i < edges.length; i++)
+    else
     {
-        line(edges[i][0], edges[i][1]);
+        for(var i = 0; i < vertices.length; i++)
+        {
+
+            var temp = vertices[i].slice();
+            
+            temp.push(1.0);
+
+            var temp2 = rotate_point4d(rot_plane, theta2, temp);
+            var temp3 = temp2.pop();
+            temp2[0] /= temp3;
+            temp2[1] /= temp3;
+            temp2[2] /= temp3;
+            temp2[3] /= temp3;
+            vertices2.push(temp2);
+        }
+        for(var i = 0; i < edges.length; i++)
+        {
+            line(edges[i][0], edges[i][1]);
+        }
+        NumVertices = edges.length * 2;
     }
 }
 
@@ -233,6 +304,24 @@ function line(a, b)
         var temp2 = vec3(mult * temp[0] * 0.6, mult * temp[1] * 0.6, mult * temp[2] * 0.6);
         points.push( temp2 );
         colors.push( vec4(mult*0.5, (1 - mult*0.5), 0.0, 1.0) );
+    
+        // for solid colored faces use 
+        //colors.push(vertexColors[a]);
+        
+    }
+}
+
+function clip_line(a, b)
+{
+    var indices = [a,b]
+    for ( var i = 0; i < indices.length; ++i ) {
+        var temp = clip_vertices[indices[i]];
+        //var mult = (temp[3] + 1.0);
+
+
+        var temp2 = vec3(temp[0], temp[1], temp[2]);
+        points.push( temp2 );
+        colors.push( vec4(0.0, 0.0, 0.0, 1.0) );
     
         // for solid colored faces use 
         //colors.push(vertexColors[a]);
