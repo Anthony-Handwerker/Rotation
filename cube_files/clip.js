@@ -3,10 +3,11 @@
 function clip_figure(vertices, edges, face_map, t)
 {
 	var ret = [[],[]];
+	var app = [];
 	//console.log(face_map);
 	for(var i = 0; i < edges.length; i++)
 	{
-		var temp = interpolate(vertices[edges[i][0]], vertices[edges[i][1]], t);
+		var temp = interpolate(vertices[edges[i][0]], vertices[edges[i][1]], t, app);
 		//console.log(temp);
 		if(temp == [])
 		{
@@ -35,16 +36,32 @@ function clip_figure(vertices, edges, face_map, t)
 			}
 		}
 	}
+
+	//console.log(app);
+	var k = ret[0].length;
+	for(var i = 0; i < app.length; i += 2)
+	{
+		ret[0].push(app[i]);
+		ret[0].push(app[i + 1]);
+		ret[1].push([k + i, k + i + 1]);
+	}
 	//console.log(ret);
 	return ret;
 }
 
-function interpolate(point1, point2, t)
+function interpolate(point1, point2, t, app)
 {
 	//console.log(point1, point2);
 	var z1 = point1[3];
 	var z2 = point2[3];
+	if((z1 == z2) && (z1 == t))
+	{
+		app.push(point1.slice(0));
+		app.push(point2.slice(0));
+		return [];
+	}
 	if((z1 == z2) || (z1 < z2 && (t < z1 || t > z2)) || (z1 > z2 && (t > z1 || t < z2))) return [];
+	
 	var ratio = (t - z1) / (z2 - z1);
 	//console.log(t - z1, z2 - z1);
 	var del_x = (point2[0] - point1[0]) * ratio;
