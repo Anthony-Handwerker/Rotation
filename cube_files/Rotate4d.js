@@ -2,6 +2,18 @@
 
 // axis of assumed format (translation, basis_1, basis_2, etc.)
 // TODO: Make a better one with matrices and stuff
+
+/*
+Throughout the code, before any manipulation of a vector, the vector will go
+through a series of checks and possibly be altered. This is because row vectors
+are either represented as a proper row vector, i.e. the row as a list inside
+another list, or simply as a list. In the latter case, the vector is changed to
+a proper row vector so that the code does not have ot handle it separtely.
+*/
+
+
+// Basically a wrapper around the actual rotation code in rotate4d.
+// Allows this to directly be called on a point.
 function rotate_point4d(axis, angle, point) {
 	var mats = rotate4d(axis, angle, point);
 	var tmp = transpose([point]);
@@ -12,18 +24,13 @@ function rotate_point4d(axis, angle, point) {
 	return tmp;
 }
 /*
-function is_independent(a, b, c)
-{
-	var y = (a[0]*c[1]-a[1]*c[0])/(a[0]*b[1]-b[0]*a[1])
-	//console.log(y);
-	var x = (c[0]-b[0]*y)/a[0];
-	if(a[2]*x + b[2]*y != c[2])
-		return true;
-	if(a[3]*x + b[3]*y != c[3])
-		return true;
-	return false;
-}
+Tests the independence of a vector from a set of other vectors.
+Accomplished by taking the summation of the dot product of the vector (vec)
+with each of the vectors in basis. If the summation is the same as the
+initial vector, then it is linearly dependent on the basis. Otherwise, it is
+independent.
 */
+
 function is_independent(basis, vec) {
 	var res_vec = [];
 	if (!Array.isArray(vec[0])) {
@@ -47,16 +54,24 @@ function is_independent(basis, vec) {
 }
 
 function rotate4d(axis, angle, point) {
+	var axis_translation = axis[0];
 	var tmp = gram_shmidt(axis.slice(1));
 	axis[1] = tmp[0];
 	axis[2] = tmp[1];
+	
+	/* axis is the proper, orthonormalized basis of the axis of rotation. */
 
 	s = normal_space(axis.slice(1));
 	
 	// console.log("s");
 	// log_matrix(s);
-
 	
+	/*
+	This is the intersection of the normal space to the plane of rotation and
+	the plane itself, in terms of the normal space. It is a constant unit
+	vector because it is an axis of the plane which is chosen when creating
+	the normal space.
+	*/
 	intersection = [1, 0, 0, 1];
 	space = s[0];
 	
@@ -81,7 +96,7 @@ function rotate4d(axis, angle, point) {
 	// console.log("space");
 	// log_matrix(space);
 	
-	var translation = transpose([axis[0]]);
+	var translation = transpose([axis_translation]);
 	translation = scal_mult(translation, -1);
 	
 	// console.log("translation");
