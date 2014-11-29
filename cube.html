@@ -62,7 +62,19 @@ main()
 <canvas id="gl-canvas" width="512" height="512">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
-   
+<div id="debug_info" style="position: absolute; top:0px; left:512px; width:300px; height:200px">
+Angle: 
+<br>
+Rotation Speed: 
+<br>
+Vector 1: 
+<br>
+Vector 2: 
+<br>
+Clipping: 
+<br>
+Clipping T-Value:
+</div>
 <br>
 
 <button id="Toggle_Rotate">Rotate Toggle</button>
@@ -86,6 +98,7 @@ Oops ... your browser doesn't support the HTML5 canvas element
 <br>
 <button id="Clip">Clip Model</button>
 <br>
+<div> clip t-value -1.0 <input id="clip_val" type="range" min="-1.0" max="1.0" step="0.1" values="0.0"/> 1.0 </div>
 <input type="file" id="model"/>
 
 

@@ -20,6 +20,8 @@ var rot_speed = 1.0;
 var theta = [ 0, 0, 0 ];
 var theta2 = 0.0;
 
+var clip_value = 0.0;
+
 var thetaLoc;
 
 var is_rotating = false;
@@ -93,6 +95,8 @@ window.onload = function init()
     document.getElementById( "Clip" ).onclick = function()
     {
         clip_flag = !clip_flag;
+        if(clip_flag) event.srcElement.innerHTML = "Project Model";
+        else event.srcElement.innerHTML = "Clip Model";
     }
 
     document.getElementById( "New_Rotate" ).onclick = function () {
@@ -198,6 +202,11 @@ window.onload = function init()
         rot_speed = parseFloat(event.srcElement.value);
         //console.log(rot_speed);
     };
+
+    document.getElementById("clip_val").onchange = function() {
+        clip_value = parseFloat(event.srcElement.value);
+        //console.log(rot_speed);
+    };
     
     render();
 }
@@ -255,7 +264,7 @@ function colorCube()
             temp2[3] /= temp3;
             vertices2.push(temp2);
         }
-        var temp = clip_figure(vertices2, edges, face_map, 0.0);
+        var temp = clip_figure(vertices2, edges, face_map, clip_value);
         //console.log(temp);
 
         clip_vertices = temp[0].slice(0);
@@ -352,6 +361,16 @@ function quad(a, b, c, d)
     }
 }
 
+function updateDebug()
+{
+    document.getElementById("debug_info").innerHTML = "Angle: " + theta2 +
+    "<br>Rotation Speed: " + rot_speed + 
+    "<br>Vector 1: " + rot_plane[1] +
+    "<br>Vector 2: " + rot_plane[2] +
+    "<br>Clipping: " + clip_flag +
+    "<br>Clipping T-Value:" + clip_value;
+}
+
 function render()
 {
     colorCube();
@@ -385,11 +404,8 @@ function render()
 
     gl.drawArrays( gl.LINES, 0, NumVertices );
 
-    
-
     requestAnimFrame( render );
 
-    
-
+    updateDebug();
 }
 
