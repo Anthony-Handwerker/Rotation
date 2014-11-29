@@ -11,9 +11,10 @@ another list, or simply as a list. In the latter case, the vector is changed to
 a proper row vector so that the code does not have ot handle it separtely.
 */
 
-
-// Basically a wrapper around the actual rotation code in rotate4d.
-// Allows this to directly be called on a point.
+/* 
+Basically a wrapper around the actual rotation code in rotate4d.
+Allows this to directly be called on a point.
+*/
 function rotate_point4d(axis, angle, point) {
 	var mats = rotate4d(axis, angle, point);
 	var tmp = transpose([point]);
