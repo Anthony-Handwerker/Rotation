@@ -34,7 +34,7 @@ var vertices = [];
 var edges = [];
 var vertices2 = [];
 var vertices_default = [];
-var face_map = [];
+var face_map = []; // EdgexEdge matrix, true if two edges share a face.
 
 var clip_flag = false;
 
@@ -55,7 +55,7 @@ window.onload = function init()
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    colorCube();
+    drawFigure();
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -88,10 +88,12 @@ window.onload = function init()
     
     //event listeners for buttons
     
+    // turn rotation on or off
     document.getElementById( "Toggle_Rotate" ).onclick = function () {
         is_rotating = !is_rotating;
     };
 
+    // turn clipping on or off
     document.getElementById( "Clip" ).onclick = function()
     {
         clip_flag = !clip_flag;
@@ -99,6 +101,7 @@ window.onload = function init()
         else event.srcElement.innerHTML = "Clip Model";
     }
 
+    // Change the plane of rotation
     document.getElementById( "New_Rotate" ).onclick = function () {
         vertices = vertices2.slice(0);
         theta2 = 0;
@@ -112,12 +115,15 @@ window.onload = function init()
                     parseFloat(document.getElementById("z2").value),
                     parseFloat(document.getElementById("t2").value)]];
     };
+
+    // Reset back to the initial rotation and camera view.
     document.getElementById("Reset").onclick = function() {
         vertices = vertices_default.slice(0);
         theta2 = 0;
         theta = [0,0,0];
     };
 
+    // Load new model.
     var fileInput = document.getElementById("model");
     fileInput.addEventListener('change', function(e)
     {
@@ -150,11 +156,11 @@ window.onload = function init()
                     flag = 2;
                     face_map = [];
                     var temp = [];
-                    for(var j = 0; j < edges.length; j++)
+                    for(var j = 0; j < edges.length; j++) // creates a list of n falses, where n is the number of edges
                     {
                         temp.push(false);
                     }
-                    for(var j = 0; j < edges.length; j++)
+                    for(var j = 0; j < edges.length; j++) 
                     {
                         face_map.push(temp.slice(0));
                     }
@@ -162,7 +168,7 @@ window.onload = function init()
                 else if(flag == 1)
                 {
                     var line = vals[i].split(" ");
-                    var newEdge = [parseInt(line[0]), parseInt(line[1])];
+                    var newEdge = [parseInt(line[0]), parseInt(line[1])]; //adds an edge to the edge list.
                     edges.push(newEdge);
                     //console.log(newEdge);
                     NumVertices += 2;
@@ -173,7 +179,7 @@ window.onload = function init()
                     var newVertex = [parseFloat(line[0]), parseFloat(line[1]), parseFloat(line[2]), parseFloat(line[3])];
                     vertices.push(newVertex);
                     vertices2.push(newVertex.slice(0));
-                    vertices_default.push(newVertex.slice(0));
+                    vertices_default.push(newVertex.slice(0)); // add a vertex to the vertex list.
                 }
                 else if(flag == 2)
                 {
@@ -182,10 +188,10 @@ window.onload = function init()
                     {
                         for(var k = j + 1; k < line.length; k++)
                         {
-                            var a = parseInt(line[j]);
+                            var a = parseInt(line[j]); 
                             var b = parseInt(line[k]);
                             face_map[a][b] = true;
-                            face_map[b][a] = true;
+                            face_map[b][a] = true; // adds the edge combo to the face_map
                         }
                     }
                 }
@@ -198,11 +204,13 @@ window.onload = function init()
         reader.readAsText(file);
     });
 
+    // changes speed.
     document.getElementById("speed").onchange = function() {
         rot_speed = parseFloat(event.srcElement.value);
         //console.log(rot_speed);
     };
 
+    // changes clipping t-value.
     document.getElementById("clip_val").onchange = function() {
         clip_value = parseFloat(event.srcElement.value);
         //console.log(rot_speed);
@@ -211,16 +219,15 @@ window.onload = function init()
     render();
 }
 
-
-
+// setup for camera panning.
 function handleMouseDown(event) {
-    mouseDown = true;
+    mouseDown = true; // initiates camera rotation
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
 }
 
 function handleMouseUp(event) {
-    mouseDown = false;
+    mouseDown = false; //stops camera rotation
 }
 
 function handleMouseMove(event) {
@@ -231,10 +238,9 @@ function handleMouseMove(event) {
     var newY = event.clientY;
 
     var deltaX = newX - lastMouseX;
-    
-
     var deltaY = newY - lastMouseY;
 
+    // changes the camera rotation.
     theta[0] += deltaY/5.0;
     theta[1] += deltaX/5.0;
 
@@ -242,21 +248,22 @@ function handleMouseMove(event) {
     lastMouseY = newY;
 }
 
-function colorCube()
+function drawFigure()
 {
 
     points=[];
     vertices2=[];
     colors = [];
-    if (clip_flag)
+    if (clip_flag) // if we are drawing a 3D cross-section of the figure.
     {
-        for(var i = 0; i < vertices.length; i++)
+
+        for(var i = 0; i < vertices.length; i++) // loop through the vertices and rotate them all
         {
             var temp = vertices[i].slice();
             
             temp.push(1.0);
 
-            var temp2 = rotate_point4d(rot_plane, theta2, temp);
+            var temp2 = rotate_point4d(rot_plane, theta2, temp); // rotate the vertex
             var temp3 = temp2.pop();
             temp2[0] /= temp3;
             temp2[1] /= temp3;
@@ -264,27 +271,26 @@ function colorCube()
             temp2[3] /= temp3;
             vertices2.push(temp2);
         }
-        var temp = clip_figure(vertices2, edges, face_map, clip_value);
-        //console.log(temp);
+        var temp = clip_figure(vertices2, edges, face_map, clip_value); // clip the figure
 
         clip_vertices = temp[0].slice(0);
         clip_edges = temp[1].slice(0);
         for(var i = 0; i < clip_edges.length; i++)
         {
-            clip_line(clip_edges[i][0], clip_edges[i][1]);
+            clip_line(clip_edges[i][0], clip_edges[i][1]); // add a clipped line to the draw buffer
         }
-        NumVertices = clip_edges.length * 2;
+        NumVertices = clip_edges.length * 2; // change the NumVertices for drawing.
     }
-    else
+    else // if we're drawing projection view.
     {
-        for(var i = 0; i < vertices.length; i++)
+        for(var i = 0; i < vertices.length; i++) // loop through and rotate the vertices.
         {
 
             var temp = vertices[i].slice();
             
             temp.push(1.0);
 
-            var temp2 = rotate_point4d(rot_plane, theta2, temp);
+            var temp2 = rotate_point4d(rot_plane, theta2, temp); // rotate each point
             var temp3 = temp2.pop();
             temp2[0] /= temp3;
             temp2[1] /= temp3;
@@ -292,76 +298,42 @@ function colorCube()
             temp2[3] /= temp3;
             vertices2.push(temp2);
         }
-        for(var i = 0; i < edges.length; i++)
+        for(var i = 0; i < edges.length; i++) // add each point to the draw buffer
         {
             line(edges[i][0], edges[i][1]);
         }
-        NumVertices = edges.length * 2;
+        NumVertices = edges.length * 2; // update the number of vertices to be drawn.
     }
 }
 
-function line(a, b)
+function line(a, b) // add a line to the draw buffer.
 {
     var indices = [a, b];
 
     for ( var i = 0; i < indices.length; ++i ) {
         var temp = vertices2[indices[i]];
-        //var mult = (temp[3] + 1.0);
 
-        var mult = Math.pow(3.0,temp[3]);
+        var mult = Math.pow(3.0,temp[3]); // scale based on the t-value
 
         var temp2 = vec3(mult * temp[0] * 0.6, mult * temp[1] * 0.6, mult * temp[2] * 0.6);
         points.push( temp2 );
         colors.push( vec4(mult*0.5, (1 - mult*0.5), 0.0, 1.0) );
-    
-        // for solid colored faces use 
-        //colors.push(vertexColors[a]);
-        
     }
 }
 
-function clip_line(a, b)
+function clip_line(a, b) // add a line to the draw buffer, without t-scaling or coloring.
 {
     var indices = [a,b]
     for ( var i = 0; i < indices.length; ++i ) {
         var temp = clip_vertices[indices[i]];
-        //var mult = (temp[3] + 1.0);
-
 
         var temp2 = vec3(temp[0], temp[1], temp[2]);
         points.push( temp2 );
-        colors.push( vec4(0.0, 0.0, 0.0, 1.0) );
-    
-        // for solid colored faces use 
-        //colors.push(vertexColors[a]);
-        
+        colors.push( vec4(0.0, 0.0, 0.0, 1.0) );       
     }
 }
 
-function quad(a, b, c, d) 
-{
-    
-
-    
-    var indices = [ a, b, b, c, c, d, d, a ];
-
-    for ( var i = 0; i < indices.length; ++i ) {
-        var temp = vertices2[indices[i]];
-        //var mult = (temp[3] + 1.0);
-
-        var mult = Math.pow(3.0,temp[3]);
-
-        var temp2 = vec3(mult * temp[0] * 0.6, mult * temp[1] * 0.6, mult * temp[2] * 0.6);
-        points.push( temp2 );
-        colors.push( vec4(mult*0.5, (1 - mult*0.5), 0.0, 1.0) );
-    
-        // for solid colored faces use 
-        //colors.push(vertexColors[a]);
-        
-    }
-}
-
-function updateDebug()
+function updateDebug() // update the debg info.
 {
     document.getElementById("debug_info").innerHTML = "Angle: " + theta2 +
     "<br>Rotation Speed: " + rot_speed + 
@@ -373,10 +345,10 @@ function updateDebug()
 
 function render()
 {
-    colorCube();
+    drawFigure(); // redraw the figure
 
     
-
+    //set all drawing buffers
     var vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
@@ -393,19 +365,17 @@ function render()
     gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vColor );
 
-    if (is_rotating) theta2 += rot_speed;
+    if (is_rotating) theta2 += rot_speed; // rotate the figure.
     theta2 %= 360.0;
-    //console.log(theta2);
     
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    //theta[axis] += 2.0;
     gl.uniform3fv(thetaLoc, theta);
 
     gl.drawArrays( gl.LINES, 0, NumVertices );
 
     requestAnimFrame( render );
 
-    updateDebug();
+    updateDebug(); // update the debug information
 }
 
