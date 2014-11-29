@@ -95,6 +95,11 @@ function rotate4d(axis, angle, point) {
 	
 	// console.log("space");
 	// log_matrix(space);
+	/*
+	This creates the translation matrix to account for the translation of the
+	axis away from the origin. It is applied to the point before the rotaiton
+	matrix.
+	*/
 	
 	var translation = transpose([axis_translation]);
 	translation = scal_mult(translation, -1);
@@ -115,6 +120,10 @@ function rotate4d(axis, angle, point) {
 	// console.log("transpose([point])");
 	// log_matrix(transpose([point]));
 
+	/*
+	This determines the translation required to put the point within the space
+	and adds it to the initial translation generated above.
+	*/
 	var tmp = nd_mult(pre_translate, transpose([point]));
 	// console.log("tmp");
 	// log_matrix(tmp);
@@ -163,6 +172,11 @@ function rotate4d(axis, angle, point) {
 	// console.log("pre_translate_2");
 	// log_matrix(pre_translate);
 	
+	/*
+	This is the space matrix, which finds the position of the point in terms of
+	the normal space which we will perform 3d rotation in.
+	*/
+	
 	var res_mat = space;
 	// console.log("res_mat_3");
 	// log_matrix(res_mat);
@@ -179,13 +193,25 @@ function rotate4d(axis, angle, point) {
 	tmp_intersection.splice(-1, 1);
 	// console.log("tmp_intersection");
 	// console.log(tmp_intersection);
-
+	
+	/*
+	This is where the actual rotation ocurrs, a 3d rotation on the point in
+	terms of the normal space around the intersection between the normal
+	space and the axis of rotation.
+	The angle is just the angle input to the function.
+	*/
 	res_mat = nd_mult(rotate(angle, tmp_intersection), res_mat);
 	// console.log("res_mat_4");
 	// log_matrix(res_mat);
 
 	// console.log("transpose(space)");
 	// log_matrix(transpose(space));
+	
+	/*
+	Past here all the preperatory changes are undone. First the new point is
+	found in terms of the base 4d coordinates, then the two translations are
+	undone.
+	*/
 	
 	res_mat = nd_mult(transpose(space), res_mat);
 	// console.log("res_mat_5");
@@ -215,6 +241,9 @@ function rotate4d(axis, angle, point) {
 // space has form [translation, basis]
 // Uses dot from MV.js
 
+/*
+Creates an n x n identity matrix.
+*/
 function matn(n) {
 	var res_mat = [];
 	for (var i = 0; i < n; i++) {
@@ -228,7 +257,10 @@ function matn(n) {
 	}
 	return res_mat;
 }
-
+/*
+Matrix multiplication in n dimensions.
+That's what the nd prefix means, by the way.
+*/
 function nd_mult(u, v) {
 	var result = [];
 	for (var i = 0; i < u.length; i++) {
@@ -252,6 +284,9 @@ function nd_mult(u, v) {
 	return result;
 }
 
+/*
+Multiplies a vector by a scalar.
+*/
 function scal_mult(mat, val) {
 	var res_mat = [];
 	if (!Array.isArray(mat[0])) {
@@ -292,10 +327,10 @@ function nd_translate(translation) {
 	}
 	return res_mat;
 }
-
-// TODO: use less probabilistic method
+/*
+Finds the normal space to a given plane.
+*/
 function normal_space(basis, x, y) {
-	// two random vectors hopefully linearly independent of the basis.
 	var y = basis[0].length;
 	var test_vecs = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
 	
@@ -303,7 +338,11 @@ function normal_space(basis, x, y) {
 	for (var i = 0; i < basis.length; i++) {
 		result_space.push(basis[i].slice(0))
 	}
-	
+	/*
+	First, we find two vectors which are linearly independent of the basis.
+	At least two of the axis vectors are gaurunteed to be independent, so we
+	use those.
+	*/
 	var new_vec1;
 	var i = 0;
 	for (i = 0; i < 4; i++) {
@@ -313,6 +352,11 @@ function normal_space(basis, x, y) {
 			break;
 		}
 	}
+	/*
+	For each of the vectors, we use the gram-shmidt orthonormalization
+	process to create a proper orthonormal basis, suitable for representing
+	vectors in the space in terms of the basis vectors.
+	*/
 	
 	result_space.push(new_vec1);
 	result_space = gram_shmidt(result_space);
@@ -336,14 +380,23 @@ function normal_space(basis, x, y) {
 	
 	// console.log("gram_shmidt");
 	// log_matrix(result_space);
-	
+	/*
+	The result space consists of the two generated vectors plus one of the
+	vectors from the plane, which will be the intersection between the plane
+	and the space and will serve as the axis of 3d rotation.
+	*/
 	var intersection = result_space[1];
 	result_space.splice(0, 1);
 			
 	return [result_space, intersection];
 }
 
-
+/*
+Gram-shmidt orthonormalization of a basis. Basically, for a set of linearly
+independent vectors we look at each vector in turn and subtract it's projection
+on to each of the previous vectors, ensuring it's orthogonality to them. Then
+each of the vectors are normalized.
+*/
 function gram_shmidt(basis) {
 	var empty = [];
 	for (var i = basis[0].length - 1; i >= 0; i--) {
@@ -386,7 +439,7 @@ function magnitude(v) {
 	return res;
 }
 
-function transpose(v) { // Column vector to row vector.
+function transpose(v) { 
 	var rows = v.length;
 	var columns = v[0].length;
 	
@@ -406,6 +459,11 @@ function nd_normalize(basis) { // for row vectors
 	}
 	return basis;
 }
+
+/*
+Below are logging and testing functions. They are not used in any of the actual
+logic.
+*/
 
 function log_matrix (v) {
 	var rows = v.length;
