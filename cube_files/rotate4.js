@@ -122,6 +122,47 @@ window.onload = function init()
         theta2 = 0;
         theta = [0,0,0];
     };
+    
+    document.getElementById("Preset_1").onclick = function() {
+        vertices = vertices2.slice(0);
+        theta2 = 0;
+        rot_plane = [[0, 0, 0, 0, 1], [1, 0, 0, 1], [0, 1, 1, 0]];
+        document.getElementById("x1").value = 1.0;
+        document.getElementById("y1").value = 1.0;
+        document.getElementById("z1").value = 0.0;
+        document.getElementById("t1").value = 0.0;
+        document.getElementById("x2").value = 0.0;
+        document.getElementById("y2").value = 1.0;
+        document.getElementById("z2").value = 1.0;
+        document.getElementById("t2").value = 0.0;
+    }
+    document.getElementById("Preset_2").onclick = function() {
+        vertices = vertices2.slice(0);
+        theta2 = 0;
+        rot_plane = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 0, 0, 1]];
+        document.getElementById("x1").value = 1.0;
+        document.getElementById("y1").value = 0.0;
+        document.getElementById("z1").value = 0.0;
+        document.getElementById("t1").value = 0.0;
+        document.getElementById("x2").value = 0.0;
+        document.getElementById("y2").value = 0.0;
+        document.getElementById("z2").value = 0.0;
+        document.getElementById("t2").value = 1.0;
+    }
+    document.getElementById("Preset_3").onclick = function() {
+        vertices = vertices2.slice(0);
+        theta2 = 0;
+        rot_plane = [[0, 0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]];
+        document.getElementById("x1").value = 1.0;
+        document.getElementById("y1").value = 0.0;
+        document.getElementById("z1").value = 0.0;
+        document.getElementById("t1").value = 0.0;
+        document.getElementById("x2").value = 0.0;
+        document.getElementById("y2").value = 1.0;
+        document.getElementById("z2").value = 0.0;
+        document.getElementById("t2").value = 0.0;
+    }
+
 
     // Load new model.
     var fileInput = document.getElementById("model");
