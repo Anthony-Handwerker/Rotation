@@ -7,9 +7,7 @@ Open rotate4.html in any HTML5 compatible browser (Preferrably Google Chrome.)
 -----------------------------------------------------
 Quick Start:
 
-Upon loading the program, you will see a button that says "Choose File" at the top of the program.
-Click it, then choose any file with the .4d extension. The program comes with 4: Hypercube.4d, Cube.4d, Minimal.4d,
-and TetrahedralHyperprism.4d.
+Upon loading the program, you will see a drop-down menu on the left side. Select an object from it, than click "load."
 Then, click the "Toggle Rotate" button and the program will begin rotating the object in four dimensions.
 You can click and drag the viewing space in order to rotate the camera.
 -----------------------------------------------------
@@ -17,7 +15,7 @@ Complete Guide:
 
 Here, we will detail each object in the window, from top to bottom.
 
-Choose File: Load a new model.
+Choose File: Load a new model from your computer.
 
 Viewing Window: Where the object is displayed. You may click and drag to rotate the camera (in 3 Dimensions).
 
