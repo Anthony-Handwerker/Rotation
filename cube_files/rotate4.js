@@ -42,6 +42,12 @@ var clip_vertices = [];
 var clip_edges = [];
 
 
+preset_models = []
+
+preset_models["Hypercube"] = [[[0.5,0.5,0.5,0.5], [0.5,0.5,0.5,-0.5], [0.5,0.5,-0.5,0.5], [0.5,0.5,-0.5,-0.5], [0.5,-0.5,0.5,0.5], [0.5,-0.5,0.5,-0.5], [0.5,-0.5,-0.5,0.5], [0.5,-0.5,-0.5,-0.5], [-0.5,0.5,0.5,0.5], [-0.5,0.5,0.5,-0.5], [-0.5,0.5,-0.5,0.5], [-0.5,0.5,-0.5,-0.5], [-0.5,-0.5,0.5,0.5], [-0.5,-0.5,0.5,-0.5], [-0.5,-0.5,-0.5,0.5], [-0.5,-0.5,-0.5,-0.5]], [[0.5,0.5,0.5,0.5], [0.5,0.5,0.5,-0.5], [0.5,0.5,-0.5,0.5], [0.5,0.5,-0.5,-0.5], [0.5,-0.5,0.5,0.5], [0.5,-0.5,0.5,-0.5], [0.5,-0.5,-0.5,0.5], [0.5,-0.5,-0.5,-0.5], [-0.5,0.5,0.5,0.5], [-0.5,0.5,0.5,-0.5], [-0.5,0.5,-0.5,0.5], [-0.5,0.5,-0.5,-0.5], [-0.5,-0.5,0.5,0.5], [-0.5,-0.5,0.5,-0.5], [-0.5,-0.5,-0.5,0.5], [-0.5,-0.5,-0.5,-0.5]], [[0,1], [0,2], [0,4], [0,8], [1,3], [1,5], [1,9], [2,3], [2,6], [2,10], [3,7], [3,11], [4,5], [4,6], [4,12], [5,7], [5,13], [6,7], [6,14], [7,15], [8,9], [8,10], [8,12], [9,11], [9,13], [10,11], [10,14], [11,15], [12,13], [12,14], [13,15], [14,15]], [[false,true,true,true,true,true,true,true,false,false,false,false,true,false,false,false,false,false,false,false,true,false,false,false,false,false,false,false,false,false,false,false], [true,false,true,true,true,false,false,true,true,true,false,false,false,true,false,false,false,false,false,false,false,true,false,false,false,false,false,false,false,false,false,false], [true,true,false,true,false,true,false,false,true,false,false,false,true,true,true,false,false,false,false,false,false,false,true,false,false,false,false,false,false,false,false,false], [true,true,true,false,false,false,true,false,false,true,false,false,false,false,true,false,false,false,false,false,true,true,true,false,false,false,false,false,false,false,false,false], [true,true,false,false,false,true,true,true,false,false,true,true,false,false,false,true,false,false,false,false,false,false,false,true,false,false,false,false,false,false,false,false], [true,false,true,false,true,false,true,false,false,false,true,false,true,false,false,true,true,false,false,false,false,false,false,false,true,false,false,false,false,false,false,false], [true,false,false,true,true,true,false,false,false,false,false,true,false,false,false,false,true,false,false,false,true,false,false,true,true,false,false,false,false,false,false,false], [true,true,false,false,true,false,false,false,true,true,true,true,false,false,false,false,false,true,false,false,false,false,false,false,false,true,false,false,false,false,false,false], [false,true,true,false,false,false,false,true,false,true,true,false,false,true,false,false,false,true,true,false,false,false,false,false,false,false,true,false,false,false,false,false], [false,true,false,true,false,false,false,true,true,false,false,true,false,false,false,false,false,false,true,false,false,true,false,false,false,true,true,false,false,false,false,false], [false,false,false,false,true,true,false,true,true,false,false,true,false,false,false,true,false,true,false,true,false,false,false,false,false,false,false,true,false,false,false,false], [false,false,false,false,true,false,true,true,false,true,true,false,false,false,false,false,false,false,false,true,false,false,false,true,false,true,false,true,false,false,false,false], [true,false,true,false,false,true,false,false,false,false,false,false,false,true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,true,false,false,false], [false,true,true,false,false,false,false,false,true,false,false,false,true,false,true,true,false,true,true,false,false,false,false,false,false,false,false,false,false,true,false,false], [false,false,true,true,false,false,false,false,false,false,false,false,true,true,false,false,true,false,true,false,false,false,true,false,false,false,false,false,true,true,false,false], [false,false,false,false,true,true,false,false,false,false,true,false,true,true,false,false,true,true,false,true,false,false,false,false,false,false,false,false,false,false,true,false], [false,false,false,false,false,true,true,false,false,false,false,false,true,false,true,true,false,false,false,true,false,false,false,false,true,false,false,false,true,false,true,false], [false,false,false,false,false,false,false,true,true,false,true,false,true,true,false,true,false,false,true,true,false,false,false,false,false,false,false,false,false,false,false,true], [false,false,false,false,false,false,false,false,true,true,false,false,false,true,true,false,false,true,false,true,false,false,false,false,false,false,true,false,false,true,false,true], [false,false,false,false,false,false,false,false,false,false,true,true,false,false,false,true,true,true,true,false,false,false,false,false,false,false,false,true,false,false,true,true], [true,false,false,true,false,false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true,true,true,true,true,false,false,true,false,false,false], [false,true,false,true,false,false,false,false,false,true,false,false,false,false,false,false,false,false,false,false,true,false,true,true,false,true,true,false,false,true,false,false], [false,false,true,true,false,false,false,false,false,false,false,false,false,false,true,false,false,false,false,false,true,true,false,false,true,false,true,false,true,true,false,false], [false,false,false,false,true,false,true,false,false,false,false,true,false,false,false,false,false,false,false,false,true,true,false,false,true,true,false,true,false,false,true,false], [false,false,false,false,false,true,true,false,false,false,false,false,false,false,false,false,true,false,false,false,true,false,true,true,false,false,false,true,true,false,true,false], [false,false,false,false,false,false,false,true,false,true,false,true,false,false,false,false,false,false,false,false,true,true,false,true,false,false,true,true,false,false,false,true], [false,false,false,false,false,false,false,false,true,true,false,false,false,false,false,false,false,false,true,false,false,true,true,false,false,true,false,true,false,true,false,true], [false,false,false,false,false,false,false,false,false,false,true,true,false,false,false,false,false,false,false,true,false,false,false,true,true,true,true,false,false,false,true,true], [false,false,false,false,false,false,false,false,false,false,false,false,true,false,true,false,true,false,false,false,true,false,true,false,true,false,false,false,false,true,true,true], [false,false,false,false,false,false,false,false,false,false,false,false,false,true,true,false,false,false,true,false,false,true,true,false,false,false,true,false,true,false,true,true], [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true,true,false,false,true,false,false,false,true,true,false,false,true,true,true,false,true], [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true,true,true,false,false,false,false,false,true,true,true,true,true,true,false]], [[0.5,0.5,0.5,0.5], [0.5,0.5,0.5,-0.5], [0.5,0.5,-0.5,0.5], [0.5,0.5,-0.5,-0.5], [0.5,-0.5,0.5,0.5], [0.5,-0.5,0.5,-0.5], [0.5,-0.5,-0.5,0.5], [0.5,-0.5,-0.5,-0.5], [-0.5,0.5,0.5,0.5], [-0.5,0.5,0.5,-0.5], [-0.5,0.5,-0.5,0.5], [-0.5,0.5,-0.5,-0.5], [-0.5,-0.5,0.5,0.5], [-0.5,-0.5,0.5,-0.5], [-0.5,-0.5,-0.5,0.5], [-0.5,-0.5,-0.5,-0.5]], 64]
+preset_models["Cube"] = [[[0.5,0.5,0.5,0], [0.5,0.5,-0.5,0], [0.5,-0.5,0.5,0], [0.5,-0.5,-0.5,0], [-0.5,0.5,0.5,0], [-0.5,0.5,-0.5,0], [-0.5,-0.5,0.5,0], [-0.5,-0.5,-0.5,0]], [[0.5,0.5,0.5,0], [0.5,0.5,-0.5,0], [0.5,-0.5,0.5,0], [0.5,-0.5,-0.5,0], [-0.5,0.5,0.5,0], [-0.5,0.5,-0.5,0], [-0.5,-0.5,0.5,0], [-0.5,-0.5,-0.5,0]], [[0,1], [0,2], [0,4], [1,3], [1,5], [2,3], [2,6], [3,7], [4,5], [4,6], [5,7], [6,7]], [[false,true,true,true,true,true,false,false,true,false,false,false], [true,false,true,true,false,true,true,false,false,true,false,false], [true,true,false,false,true,false,true,false,true,true,false,false], [true,true,false,false,true,true,false,true,false,false,true,false], [true,false,true,true,false,false,false,true,true,false,true,false], [true,true,false,true,false,false,true,true,false,false,false,true], [false,true,true,false,false,true,false,true,false,true,false,true], [false,false,false,true,true,true,true,false,false,false,true,true], [true,false,true,false,true,false,false,false,false,true,true,true], [false,true,true,false,false,false,true,false,true,false,true,true], [false,false,false,true,true,false,false,true,true,true,false,true], [false,false,false,false,false,true,true,true,true,true,true,false]], [[0.5,0.5,0.5,0], [0.5,0.5,-0.5,0], [0.5,-0.5,0.5,0], [0.5,-0.5,-0.5,0], [-0.5,0.5,0.5,0], [-0.5,0.5,-0.5,0], [-0.5,-0.5,0.5,0], [-0.5,-0.5,-0.5,0]], 24];
+preset_models["Minima_Figure"] = [[[0.5,0.5,0.5,-0.15], [-0.5,-0.5,0.5,-0.15], [-0.5,0.5,-0.5,-0.15], [0.5,-0.5,-0.5,-0.15], [0,0,0,0.55]], [[0.5,0.5,0.5,-0.15], [-0.5,-0.5,0.5,-0.15], [-0.5,0.5,-0.5,-0.15], [0.5,-0.5,-0.5,-0.15], [0,0,0,0.55]], [[0,1], [0,2], [0,3], [0,4], [1,2], [1,3], [1,4], [2,3], [2,4], [3,4]], [[false,true,true,true,true,true,true,false,false,false], [true,false,true,true,true,false,false,true,true,false], [true,true,false,true,false,true,false,true,false,true], [true,true,true,false,false,false,true,false,true,true], [true,true,false,false,false,true,true,true,true,false], [true,false,true,false,true,false,true,true,false,true], [true,false,false,true,true,true,false,false,true,true], [false,true,true,false,true,true,false,false,true,true], [false,true,false,true,true,false,true,true,false,true], [false,false,true,true,false,true,true,true,true,false]], [[0.5,0.5,0.5,-0.15], [-0.5,-0.5,0.5,-0.15], [-0.5,0.5,-0.5,-0.15], [0.5,-0.5,-0.5,-0.15], [0,0,0,0.55]], 20];
+preset_models["Tetrahedral_Hyperprism"] = [[[0.5,0.5,0.5,0.5], [-0.5,-0.5,0.5,0.5], [-0.5,0.5,-0.5,0.5], [0.5,-0.5,-0.5,0.5], [0.5,0.5,0.5,-0.5], [-0.5,-0.5,0.5,-0.5], [-0.5,0.5,-0.5,-0.5], [0.5,-0.5,-0.5,-0.5]], [[0.5,0.5,0.5,0.5], [-0.5,-0.5,0.5,0.5], [-0.5,0.5,-0.5,0.5], [0.5,-0.5,-0.5,0.5], [0.5,0.5,0.5,-0.5], [-0.5,-0.5,0.5,-0.5], [-0.5,0.5,-0.5,-0.5], [0.5,-0.5,-0.5,-0.5]], [[0,1], [0,2], [0,3], [0,4], [1,2], [1,3], [1,5], [2,3], [2,6], [3,7], [4,5], [4,6], [4,7], [5,6], [5,7], [6,7]], [[false,true,true,true,true,true,true,false,false,false,true,false,false,false,false,false], [true,false,true,true,true,false,false,true,true,false,false,true,false,false,false,false], [true,true,false,true,false,true,false,true,false,true,false,false,true,false,false,false], [true,true,true,false,false,false,true,false,true,true,true,true,true,false,false,false], [true,true,false,false,false,true,true,true,true,false,false,false,false,true,false,false], [true,false,true,false,true,false,true,true,false,true,false,false,false,false,true,false], [true,false,false,true,true,true,false,false,true,true,true,false,false,true,true,false], [false,true,true,false,true,true,false,false,true,true,false,false,false,false,false,true], [false,true,false,true,true,false,true,true,false,true,false,true,false,true,false,true], [false,false,true,true,false,true,true,true,true,false,false,false,true,false,true,true], [true,false,false,true,false,false,true,false,false,false,false,true,true,true,true,false], [false,true,false,true,false,false,false,false,true,false,true,false,true,true,false,true], [false,false,true,true,false,false,false,false,false,true,true,true,false,false,true,true], [false,false,false,false,true,false,true,false,true,false,true,true,false,false,true,true], [false,false,false,false,false,true,true,false,false,true,true,false,true,true,false,true], [false,false,false,false,false,false,false,true,true,true,false,true,true,true,true,false]], [[0.5,0.5,0.5,0.5], [-0.5,-0.5,0.5,0.5], [-0.5,0.5,-0.5,0.5], [0.5,-0.5,-0.5,0.5], [0.5,0.5,0.5,-0.5], [-0.5,-0.5,0.5,-0.5], [-0.5,0.5,-0.5,-0.5], [0.5,-0.5,-0.5,-0.5]], 32];
 
 window.onload = function init()
 {
@@ -92,6 +98,17 @@ window.onload = function init()
     document.getElementById( "Toggle_Rotate" ).onclick = function () {
         is_rotating = !is_rotating;
     };
+    
+    document.getElementById( "load_premade" ).onclick = function () {
+        var premade = document.getElementById("file_select").value;
+        vertices =          preset_models[premade][0];
+        vertices2 =         preset_models[premade][1];
+        edges =             preset_models[premade][2];
+        face_map =          preset_models[premade][3];
+        vertices_default =  preset_models[premade][4];
+        NumVertices =       preset_models[premade][5];
+    };
+
 
     // turn clipping on or off
     document.getElementById( "Clip" ).onclick = function()
@@ -240,8 +257,18 @@ window.onload = function init()
             theta = [0,0,0];
             theta2 = 0.0;
             is_rotating = false;
-        }
+            // Code to output the arrays representing a model to text;
+            // var model_compact = "[";
+            // model_compact += transcribe2DArray(vertices) + ", ";
+            // model_compact += transcribe2DArray(vertices2) + ", ";
+            // model_compact += transcribe2DArray(edges) + ", ";
+            // model_compact += transcribe2DArray(face_map) + ", ";
+            // model_compact += transcribe2DArray(vertices_default) + ", ";
+            // model_compact += NumVertices;
+            // model_compact += "]\n";
+            // console.log(model_compact);
 
+        }
         reader.readAsText(file);
     });
 
@@ -258,6 +285,18 @@ window.onload = function init()
     };
     
     render();
+}
+
+function transcribe2DArray(arr) {
+    var outstr = "["
+    for (var i = 0; i < arr.length; i++) {
+        outstr += "[" + arr[i] + "]";
+        if (i != arr.length - 1) {
+            outstr += ", ";
+        }
+    }
+    outstr += "]";
+    return outstr;
 }
 
 // setup for camera panning.
