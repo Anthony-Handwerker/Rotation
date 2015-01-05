@@ -1,5 +1,7 @@
 Rotate4: a demonstration of 4-Dimensional rotation.
 
+Based on http://www.ecse.rpi.edu/Homepages/wrf/wiki/ComputerGraphicsFall2014/Angel/WebGL/7E/04/cube.html
+
 -----------------------------------------------------
 Running the program: 
 
